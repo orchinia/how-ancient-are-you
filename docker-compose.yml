@@ -1,0 +1,27 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    ports:
+      - 3306:3306
+
+  flask-app:
+    build: ./
+    container_name: flask-app
+    restart: always
+    ports:
+      - "8888:8888"
+    environment:
+      FLASK_ENV: development
+    depends_on:
+      - mysql
+    volumes:
+      - ./:/app
