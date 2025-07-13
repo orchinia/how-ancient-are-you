@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import and_
 
 db = SQLAlchemy()
 
@@ -10,9 +11,6 @@ class Question(db.Model):
     question_type = db.Column(db.Text, nullable=False)
 
     choices = db.relationship('Choice', backref='question', lazy=True)
-
-    def __repr__(self):
-        return f"<Question {self.question_id}: {self.question[:30]}...>"
     
 
 class Choice(db.Model):
@@ -23,8 +21,19 @@ class Choice(db.Model):
     choice = db.Column(db.Text, nullable=False)
     choice_score = db.Column(db.Integer, nullable=False)
 
+
+class ResultMapping(db.Model):
+    __tablename__ = 'result_mappings'
+
+    result_id = db.Column(db.Integer, primary_key=True, autoincrement=False)
+    min_score = db.Column(db.Integer, nullable=False)
+    max_score = db.Column(db.Integer, nullable=False)
+    race = db.Column(db.Text, nullable=False)
+    age = db.Column(db.Integer, nullable=False)
+    description = db.Column(db.Text, nullable=False)
+
     def __repr__(self):
-        return f"<Choice {self.choice_id}: {self.choice[:30]}...>"
+        return f"<ResultMapping {self.race} ({self.min_score}-{self.max_score})>"
     
 
 def load_quiz_questions_optimized():
@@ -67,3 +76,32 @@ def load_quiz_questions_optimized():
     except Exception as e:
         print(f"讀取測驗題目時發生錯誤: {e}")
         return []
+    
+
+def calculate_result(data: dict) -> dict:
+    """
+    Args:
+        data: dict of {'question_id(str)': 'option_value(str)'}
+    
+    Returns:
+        dict with keys: race, age, description (from result_mappings)
+    """
+    scores = [int(v) for v in data.values()]
+    total_score = sum(scores)
+
+    # 查詢符合區間的 result mapping
+    result = ResultMapping.query.filter(
+        and_(
+            ResultMapping.min_score <= total_score,
+            ResultMapping.max_score >= total_score
+        )
+    ).first()
+
+    if not result:
+        raise ValueError(f"No result mapping found for score: {total_score}")
+
+    return {
+        "race": result.race,
+        "age": result.age,
+        "description": result.description,
+    }

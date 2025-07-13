@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 
-from models import db, load_quiz_questions_optimized
+from models import calculate_result, db, load_quiz_questions_optimized
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:admin@mysql/mydb'
@@ -18,34 +18,6 @@ def index():
 def quiz():
     quiz_questions = load_quiz_questions_optimized()
     return render_template("quiz.html", quiz_questions=quiz_questions)
-
-def calculate_result(data):
-    """
-        data = dict of {'question_id(str)': 'option_value(str)'}
-
-        result values = sum of option_values(int)
-
-    """
-    scores = [int(v) for v in data.values()]
-    score = sum(scores)
-    if score <= 25:
-        res = {'race': '哈比人 🍞', 'age': 22, 'description': '天真樂觀、享受生活、沒有煩惱'}
-    elif score <= 30:
-        res = {'race': '哈比人 🍞', 'age': 28, 'description': '自在與人共處，有點世故但仍愛和平'}
-    elif score <= 35:
-        res = {'race': '人類 ⚔️', 'age': 32, 'description': '熱血冒險、充滿幹勁'}
-    elif score <= 40:
-        res = {'race': '人類 ⚔️', 'age': 38, 'description': '歷經挑戰，開始重視責任與平衡'}
-    elif score <= 47:
-        res = {'race': '精靈 🌿', 'age': 120, 'description': '優雅理性，重視自然與深層思考'}
-    elif score <= 55:
-        res = {'race': '精靈 🌿', 'age': 180, 'description': '深不可測，歷練豐富，靜如止水'}
-    elif score <= 65:
-        res = {'race': '矮人 🪓', 'age': 200, 'description': '固執可靠、做事有原則'}
-    else: # score >= 66:
-        res = {'race': '矮人 🪓', 'age': 300, 'description': '長者級智慧、以沉默與行動說話'}
-    return res
-
 
 @app.route("/submit", methods=["POST"])
 def submit():
