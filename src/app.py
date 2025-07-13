@@ -1,7 +1,6 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request
 
-
-from models import db
+from models import db, load_quiz_questions_optimized
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:admin@mysql/mydb'
@@ -15,93 +14,9 @@ db.init_app(app)
 def index():
     return render_template("index.html")
 
-def load_quiz_questions():
-
-    quiz_list = [
-        {
-            "question_id": 1,
-            "question": "你最理想的日常生活是？",
-            "question_type": "single_choice",
-            "options": [
-                {"text": "鑽研技藝、建立根基", "value": 10},
-                {"text": "在樹林間冥想與藝術創作", "value": 7},
-                {"text": "種田吃點心喝下午茶", "value": 3},
-                {"text": "四處旅行冒險找機會", "value": 5}
-            ]
-        },
-        {
-            "question_id": 2,
-            "question": "面對突如其來的挑戰，你會？",
-            "question_type": "single_choice",
-            "options": [
-                {"text": "靜觀其變，等待最佳時機", "value": 7},
-                {"text": "衝上去再說！", "value": 4},
-                {"text": "找個安全角落喝茶", "value": 2},
-                {"text": "確保自己準備好所有工具", "value": 10}
-            ]
-        },
-        {
-            "question_id": 3,
-            "question": "與人意見不同時你會？",
-            "question_type": "single_choice",
-            "options": [
-                {"text": "理性討論，尋求共識", "value": 7},
-                {"text": "擺出證據和邏輯擊敗對方", "value": 10},
-                {"text": "覺得無所謂，隨他吧", "value": 3},
-                {"text": "擺臭臉但其實沒生氣", "value": 5}
-            ]
-        },
-        {
-            "question_id": 4,
-            "question": "你的社交傾向？",
-            "question_type": "single_choice",
-            "options": [
-                {"text": "大量社交我會疲憊", "value": 7},
-                {"text": "很會交朋友、講幹話很快樂", "value": 3},
-                {"text": "有時有點怕生但會主動", "value": 5},
-                {"text": "比起說話我更喜歡做事", "value": 10}
-            ]
-        },
-        {
-            "question_id": 5,
-            "question": "有人偷吃你最愛的點心，你會？",
-            "question_type": "single_choice",
-            "options": [
-                {"text": "默默補一份，當作沒事", "value": 7},
-                {"text": "把點心藏起來", "value": 10},
-                {"text": "生氣 30 秒後算了", "value": 5},
-                {"text": "哭給大家看", "value": 3}
-            ]
-        },
-        {
-            "question_id": 6,
-            "question": "你對未來的想像是？",
-            "question_type": "single_choice",
-            "options": [
-                {"text": "與大自然共存，悠然生活", "value": 7},
-                {"text": "建立自己的王國！", "value": 5},
-                {"text": "吃得飽、睡得好最重要", "value": 3},
-                {"text": "留名青史，傳承給子孫", "value": 10}
-            ]
-        },
-        {
-            "question_id": 7,
-            "question": "你理想中的家？",
-            "question_type": "single_choice",
-            "options": [
-                {"text": "地底溫暖的石室", "value": 10},
-                {"text": "被樹包圍的透明高塔", "value": 7},
-                {"text": "舒適小屋與花園", "value": 3},
-                {"text": "各地為家，無拘無束", "value": 5}
-            ]
-        }
-    ]
-
-    return quiz_list
-
 @app.route("/quiz")
 def quiz():
-    quiz_questions = load_quiz_questions()
+    quiz_questions = load_quiz_questions_optimized()
     return render_template("quiz.html", quiz_questions=quiz_questions)
 
 def calculate_result(data):
