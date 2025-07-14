@@ -10,7 +10,9 @@ class Question(db.Model):
     question = db.Column(db.Text, nullable=False)
     question_type = db.Column(db.Text, nullable=False)
 
-    choices = db.relationship('Choice', backref='question', lazy=True)
+    # 與 Choice 表格建立連結
+    # 可透過 question.choices 取得這個問題的所有選項
+    choices = db.relationship('Choice', lazy=True)
     
 
 class Choice(db.Model):
@@ -41,7 +43,24 @@ def load_quiz_questions_optimized():
     從資料庫讀取測驗題目和選項（優化版本）
     """
     try:
-        # 使用 joinedload 一次性載入問題和選項
+        # -- 等效的 SQL：
+            # SELECT
+            #     q.question_id,
+            #     q.question,
+            #     q.question_type,
+            #     c.choice_id,
+            #     c.choice,
+            #     c.choice_score
+            # FROM questions q
+            # LEFT JOIN choices c ON q.question_id = c.question_id
+            # ORDER BY q.question_id;
+
+        # -- 解釋：
+        # -- 1. LEFT JOIN 確保即使某個問題沒有選項，也會被包含在結果中
+        # -- 2. ORDER BY 確保結果按問題 ID 排序
+        # -- 3. 一次查詢就能取得所有問題及其選項
+        # -- 4. 這就是為什麼叫 "joinedload" - 用 JOIN 一次載入關聯資料
+
         questions = Question.query.options(
             db.joinedload(Question.choices)
         ).order_by(Question.question_id).all()
