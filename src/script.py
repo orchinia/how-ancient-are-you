@@ -82,8 +82,8 @@ def test_calculate_result():
 
 
 if __name__ == "__main__":
-    # import_question_csv("data/question.csv")
+    import_question_csv("data/question.csv")
     # import_choice_csv("data/choice.csv")
     # import_result_csv("data/result.csv")
     # test_load_questions()
-    test_calculate_result()
+    # test_calculate_result()
