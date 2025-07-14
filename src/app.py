@@ -1,9 +1,15 @@
 from flask import Flask, render_template, request
+import yaml
 
 from models import calculate_result, db, load_quiz_questions_optimized
 
+with open("src/host.yaml", "r") as f:
+    config = yaml.safe_load(f)
+
+mysql_host = config.get("MYSQL_HOST")
+
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:admin@140.114.55.113:3306/mydb'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://admin:admin@{mysql_host}/mydb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 DEV = True
