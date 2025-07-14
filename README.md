@@ -17,21 +17,35 @@ A fantasy-themed personality quiz that reveals your mental age and mythical race
 
 - [Docker](https://www.docker.com/)
 - (Optional) Python 3.13+ and MySQL 8.0+ if running locally
+- (Optional) Make.exe to use Makefile
 
 ### Quick Start (Recommended)
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/yourusername/how-ancient-are-you.git
+    git clone https://github.com/orchinia/how-ancient-are-you.git
     cd how-ancient-are-you
     ```
 
-2. Start the app with Docker Compose:
+2. Start the database(sql) host:
     ```sh
-    docker-compose up --build
+    make start-mysql
+    ```
+3. Start the web(flask) host:
+    ```sh
+    make build-host
+    make start-host
     ```
 
-3. Visit [http://localhost:8888](http://localhost:8888) in your browser.
+3. Import Demo data to DB:
+    ```sh
+    // 1. get into web host terminal
+    make host-shell
+    // 2. run src/script.py to import data/{table}.csv to mysql
+    python src/scrip.py
+    ```
+
+4. Visit [http://localhost:8888](http://localhost:8888) in your browser.
 
 ### Manual Setup
 
@@ -40,7 +54,7 @@ A fantasy-themed personality quiz that reveals your mental age and mythical race
     pip install -r requirements.txt
     ```
 
-2. Set up a MySQL database (see `docker-compose.yml` for credentials).
+2. Set up a MySQL database (see `Makefile` for more details).
 
 3. Run the Flask app:
     ```sh
@@ -57,7 +71,7 @@ src/
   static/          # Static files (CSS, JS, images)
 requirements.txt   # Python dependencies
 dockerfile         # Docker build instructions
-docker-compose.yml # Multi-container setup (Flask + MySQL)
+Makefile           # Automation commands for building, running, and managing the app and database
 ```
 
 ## Authors
