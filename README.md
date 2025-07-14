@@ -67,6 +67,7 @@ A fantasy-themed personality quiz that reveals your mental age and mythical race
 src/
   app.py           # Flask application entry point
   models.py        # SQLAlchemy models and quiz logic
+  host.yaml        # Customized config file for the host, specified MYSQL_HOST ip address & port
   templates/       # Jinja2 HTML templates
   static/          # Static files (CSS, JS, images)
 requirements.txt   # Python dependencies
