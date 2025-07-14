@@ -1,18 +1,41 @@
-from flask import Flask
+import argparse
+import yaml
 
-from models import db
+from flask import Flask, render_template, request
+from models import calculate_result, db, load_quiz_questions_optimized
+
+with open("src/host.yaml", "r") as f:
+    config = yaml.safe_load(f)
+
+mysql_host = config.get("MYSQL_HOST")
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:admin@mysql/mydb'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://admin:admin@{mysql_host}/mydb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+parser = argparse.ArgumentParser(description="Run the Flask app with optional debug mode.")
+parser.add_argument('--debug', action='store_true', help="Run the app in debug mode")
+args = parser.parse_args()
 
 db.init_app(app)
 
 @app.route("/")
 def index():
-    return "Hello, world!"
+    return render_template("index.html")
+
+@app.route("/quiz")
+def quiz():
+    quiz_questions = load_quiz_questions_optimized()
+    return render_template("quiz.html", quiz_questions=quiz_questions)
+
+@app.route("/submit", methods=["POST"])
+def submit():
+    # data = dict of {'question_id': 'option_value'}
+    data = request.form.to_dict()
+    res = calculate_result(data)
+    return render_template("result.html", result=res)
 
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-    app.run(host='0.0.0.0', port=8888)
+    app.run(host='0.0.0.0', port=8888, debug=args.debug)
