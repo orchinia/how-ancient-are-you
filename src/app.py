@@ -3,7 +3,7 @@ from flask import Flask, render_template, request
 from models import calculate_result, db, load_quiz_questions_optimized
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:admin@mysql/mydb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:admin@host.docker.internal:3306/mydb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 DEV = True
